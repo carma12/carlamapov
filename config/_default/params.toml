@@ -2,24 +2,24 @@
 mainSections = ["post"]
 # Output page's full content in RSS.
 rssFullContent = true
-favicon = "/favicon.png"
+favicon = "/monitor.png"
 
 [footer]
-since = 2020
-customText = ""
+since = 2023
+customText = "Monitor favicon created by Freepik"
 
 [dateFormat]
 published = "Jan 02, 2006"
 lastUpdated = "Jan 02, 2006 15:04 MST"
 
 [sidebar]
-emoji = "🍥"
-subtitle = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+# emoji = "🍥"
+subtitle = "Frontend and UI design enthusiastic."
 
 [sidebar.avatar]
 enabled = true
 local = true
-src = "img/avatar.png"
+src = "img/carla-foto-avatar.jpg"
 
 [article]
 math = false
@@ -33,8 +33,8 @@ default = "Licensed under CC BY-NC-SA 4.0"
 [[widgets.homepage]]
 type = "search"
 
-[[widgets.homepage]]
-type = "archives"
+#[[widgets.homepage]]
+#type = "archives"
 
 [widgets.homepage.params]
 limit = 5
