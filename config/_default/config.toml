@@ -1,5 +1,5 @@
 # Change baseurl before deploy
-baseurl = "https://carlamapov.github.io/"
+baseurl = "/"
 languageCode = "en-us"
 paginate = 5
 title = "Carla's blog"
