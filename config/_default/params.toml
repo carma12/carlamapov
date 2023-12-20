@@ -2,7 +2,7 @@
 mainSections = ["post"]
 # Output page's full content in RSS.
 rssFullContent = true
-favicon = "../../assets/icons/monitor-favicon.png"
+favicon = "/monitor.png"
 
 [footer]
 since = 2023
