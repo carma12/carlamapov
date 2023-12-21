@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>PatternFly on Carla's blog</title><link>/categories/patternfly/</link><description>Recent content in PatternFly on Carla's blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 19 Dec 2023 00:00:00 +0000</lastBuildDate><atom:link href="/categories/patternfly/index.xml" rel="self" type="application/rss+xml"/><item><title>Migrating PatternFly v4 to v5</title><link>/p/pf4-to-pf5-migration/</link><pubDate>Tue, 19 Dec 2023 00:00:00 +0000</pubDate><guid>/p/pf4-to-pf5-migration/</guid><description>&lt;img src="/p/pf4-to-pf5-migration/andrew-ridley-jR4Zf-riEjI-unsplash.jpg" alt="Featured image of post Migrating PatternFly v4 to v5" />&lt;h1 id="introduction">Introduction&lt;/h1>
+&lt;p>&lt;a class="link" href="https://www.patternfly.org/" target="_blank" rel="noopener"
+>PatternFly 5&lt;/a> version was recently released in August 2023. This is a major upgrade of the previous version and has landed with some exciting new features. To mention some:&lt;/p>
+&lt;ul>
+&lt;li>It supports React versions 17 and 18&lt;/li>
+&lt;li>They introduce new federated modules: a collection of independent remote software modules (associated with microfrontends)&lt;/li>
+&lt;li>Updated implementation of some popular components: Wizard, Select, Dropdown, and Table&lt;/li>
+&lt;li>Acessibility improvements&lt;/li>
+&lt;/ul>
+&lt;p>The PatternFly team has also announced that they will adopt an annual major release cadence, so we can expect a PatternFly 6 library for mid-late 2024. This also means that the previous version of PatternFly 4 library will be only maintained for addressing high-priority issues until PF6 is available, because they will be commited to maintain two PatternFly versions at the same time.&lt;/p>
+&lt;p>As a consumer of the previous one (PF4), this sounds really exciting and I couldn&amp;rsquo;t wait to check the newly released PatternFly 5 library. So I would like to share my experience adapting this library to the &lt;a class="link" href="https://github.com/freeipa/freeipa-webui" target="_blank" rel="noopener"
+>modern FreeIPA WebUI project&lt;/a> and providing some hints that I learned during the process. I hope this will help you for a successful migration ;-)&lt;/p>
+&lt;h1 id="migration-steps">Migration steps&lt;/h1>
+&lt;h2 id="upgrade-pf-version">Upgrade PF version&lt;/h2>
+&lt;p>The first step will be to upgrade the PatternFly libraries to its latest version. Easy as that.&lt;/p>
+&lt;p>In my case, as I&amp;rsquo;m using NodeJS I can rely on the &lt;code>npm&lt;/code> command to upgrade the three specific PF libraries in a single line:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="go">npm install @patternfly/patternfly@latest @patternfly/react-core@latest @patternfly/react-table@latest
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>The result:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="s2">&amp;#34;dependencies&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;@patternfly/patternfly&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;^5.1.0&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;@patternfly/react-core&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;^5.1.1&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;@patternfly/react-table&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;^5.1.1&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// (...)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>If your project uses any other PF library, the command mentioned above still will do the trick. Feel free to check the &lt;a class="link" href="https://www.patternfly.org/get-started/release-highlights/#promoted-package-versions" target="_blank" rel="noopener"
+>promoted package versions&lt;/a>) for further information.&lt;/p>
+&lt;h2 id="patternfly-codemods">PatternFly Codemods&lt;/h2>
+&lt;p>To make the migration easier, the PatternFly team has released a set of codemods to easily change, identify, and fix major issues. These can automatically adapt and resolve a large amount of problems on the code and flag any component that might require manual update.&lt;/p>
+&lt;p>In the &lt;a class="link" href="https://www.patternfly.org/get-started/upgrade" target="_blank" rel="noopener"
+>oficial guidelines&lt;/a>, they recommend to use two specific codemods:&lt;/p>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://github.com/patternfly/pf-codemods/tree/main/packages/pf-codemods" target="_blank" rel="noopener"
+>pf-codemods&lt;/a> is an eslint wrapper to update &lt;code>@patternfly/react-core@4.x.x&lt;/code> code to &lt;code>5.x.x&lt;/code>. It will also assign some deprecated components with the &lt;code>@deprecated&lt;/code> library.&lt;/li>
+&lt;li>&lt;a class="link" href="https://github.com/patternfly/pf-codemods/tree/main/packages/class-name-updater" target="_blank" rel="noopener"
+>class-name-updater&lt;/a> automatically identifies Patternfly class names that need to be updated after the introduction of versioned class names in Patternfly v5. For example: the class &lt;code>pf-u-mt-lg&lt;/code> will be transformed into &lt;code>pf-v5-u-mt-lg&lt;/code>.&lt;/li>
+&lt;/ul>
+&lt;p>Those can be run in several steps regardless of the order. And there is something else to take into account: those codemods are meant to be used &lt;strong>before&lt;/strong> making any manual changes to the code. That means that those errors and warnings can still be there even when you have resolved them, leading to the &amp;ldquo;what-did-just-happened??&amp;rdquo; loop. So just to take it into account :-)&lt;/p>
+&lt;h3 id="pf-codemods">pf-codemods&lt;/h3>
+&lt;p>To use this codemod and check the errors and warnings, we just execute the following command:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="go">npx @patternfly/pf-codemods@latest &amp;lt;path-to-source-code&amp;gt;
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>To allow the autofix to apply changes into our code (I strongly recommend this approach), we add the &lt;code>--fix&lt;/code> argument:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="go">npx @patternfly/pf-codemods@latest &amp;lt;path-to-source-code&amp;gt; --fix
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="class-name-updater">class-name-updater&lt;/h3>
+&lt;p>This codemod works very similar as the one that was mentioned before: it can be executed to &lt;em>check&lt;/em> the occurrencies or to &lt;em>fix&lt;/em> them. The last one is the most useful in this case, IMHO.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="go">npx @patternfly/class-name-updater &amp;lt;path-to-source-code&amp;gt; --fix
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="upgrade-deprecated-components">Upgrade deprecated components&lt;/h2>
+&lt;p>PatternFly 5 deprecates old implementations of some components in favor of new ones. These are:&lt;/p>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://www.patternfly.org/components/menus/select/react-deprecated" target="_blank" rel="noopener"
+>Select&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.patternfly.org/components/menus/dropdown/react-deprecated" target="_blank" rel="noopener"
+>Dropdown&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.patternfly.org/components/table/react-deprecated" target="_blank" rel="noopener"
+>Table&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.patternfly.org/components/wizard/react-deprecated" target="_blank" rel="noopener"
+>Wizard&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.patternfly.org/components/menus/context-selector/" target="_blank" rel="noopener"
+>Context selector&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.patternfly.org/components/menus/application-launcher" target="_blank" rel="noopener"
+>Application launcher&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.patternfly.org/components/menus/options-menu" target="_blank" rel="noopener"
+>Options menu&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.patternfly.org/components/page/react-deprecated" target="_blank" rel="noopener"
+>Page header&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>Those will remain in the code base until, at least, the next major release (PF6).&lt;/p>
+&lt;p>So for those projects that started with the previous PF4 version (like the &lt;a class="link" href="https://github.com/freeipa/freeipa-webui" target="_blank" rel="noopener"
+>new FreeIPA WebUI&lt;/a>), is important to adapt those components to use the new ones. In order to do so, we just need to search in your code any PatternFly library that has the &lt;code>deprecated&lt;/code> suffix. E.g. using the &lt;code>Select&lt;/code> components:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">Select&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">SelectOption&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">SelectVariant&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">SelectDirection&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s2">&amp;#34;@patternfly/react-core/deprecated&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Once we identify the deprecated components in our code, we just need to replace them by the non-deprecated ones referencing the &lt;code>@patternfly/react-core&lt;/code> library.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">Select&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">SelectOption&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">SelectVariant&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">SelectDirection&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s2">&amp;#34;@patternfly/react-core&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>It is important to note that some parameters and variables can be different from the deprecated version to the current one, so those will need to be changed. This effort may vary depending on how big is our project and the components used. Following the same example with the &lt;code>Select&lt;/code> example:&lt;/p>
+&lt;p>Deprecated component:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Select&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">id&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;revocation-certificate-authority&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">variant&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;single&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">placeholderText&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34; &amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">aria&lt;/span>&lt;span class="err">-&lt;/span>&lt;span class="na">label&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;Select a certificate authority for the revocation&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">aria&lt;/span>&lt;span class="err">-&lt;/span>&lt;span class="na">labelledby&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;revocation certificate authority&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">selections&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">CASelected&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">isOpen&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">isCAOpen&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">onToggle&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{(&lt;/span>&lt;span class="nx">_event&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">isOpen&lt;/span>: &lt;span class="kt">boolean&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="nx">onCAToggle&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">isOpen&lt;/span>&lt;span class="p">)}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">onSelect&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">onCASelect&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>&lt;span class="nx">CAOptions&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">map&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="nx">option&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">index&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">SelectOption&lt;/span> &lt;span class="na">key&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">index&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="na">value&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">option&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">))}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">Select&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>New component:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Select&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">id&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;revocation-certificate-authority&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">aria&lt;/span>&lt;span class="err">-&lt;/span>&lt;span class="na">label&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;Select a certificate authority for the revocation&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">aria&lt;/span>&lt;span class="err">-&lt;/span>&lt;span class="na">labelledby&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;revocation certificate authority&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">selected&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">CASelected&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">isOpen&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">isCAOpen&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">toggle&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">toggleCASelect&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">onSelect&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">onCASelect&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>&lt;span class="nx">CAOptions&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">map&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="nx">option&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">index&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">SelectOption&lt;/span> &lt;span class="na">key&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">index&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="na">value&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">option&lt;/span>&lt;span class="p">}&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>&lt;span class="nx">option&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">SelectOption&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">))}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">Select&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Not only the &lt;strong>component parameters&lt;/strong>, but also the expected &lt;strong>method parameters&lt;/strong> can change. Following with the example as a reference, the &lt;code>onToggle&lt;/code> parameter has been transformed into &lt;code>toggle&lt;/code> and it must be returned as a reference:&lt;/p>
+&lt;p>New component:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// Toggle
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">toggleCASelect&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">toggleRef&lt;/span>: &lt;span class="kt">React.Ref&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">MenuToggleElement&lt;/span>&lt;span class="p">&amp;gt;)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">MenuToggle&lt;/span> &lt;span class="na">ref&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">toggleRef&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="na">onClick&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">onCAToggle&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="na">className&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;pf-v5-u-w-100&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>&lt;span class="nx">CASelected&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">MenuToggle&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="leftovers-on-building">Leftovers on building&lt;/h2>
+&lt;p>At this point, most (if not all) problems should be fixed. However, I strongly recommend to build your project and address any possible errors and leftovers in the code.&lt;/p>
+&lt;p>As the &lt;a class="link" href="https://github.com/freeipa/freeipa-webui" target="_blank" rel="noopener"
+>new FreeIPA WebUI&lt;/a> is relying on Webpack, I just had to use the alias (&lt;code>npm run start&lt;/code>). But if your React project uses another bundler such as &lt;a class="link" href="https://create-react-app.dev/" target="_blank" rel="noopener"
+>create-react-app&lt;/a>, you can build it via &lt;code>npm run build&lt;/code>. In any case, a double-check on the project to detect any unexpected errors won&amp;rsquo;t hurt.&lt;/p>
+&lt;h2 id="bonus-cypress">Bonus: Cypress&lt;/h2>
+&lt;p>Although this is not mentioned in the official guide, it is good to keep in mind when migrating in React projects.&lt;/p>
+&lt;p>If your project is using &lt;a class="link" href="https://www.cypress.io/" target="_blank" rel="noopener"
+>Cypress&lt;/a> to perform integration and/or e2e tests, you might also want to adapt the tests and replace old the class names to PatternFly 5 ones. As some of the components have changed their core structure, this will likely cause tests to fail if they are referencing deprecated structures. This only applies to the newly implemented components that we mentioned above.&lt;/p>
+&lt;p>E.g.: Cypress code using deprecated class names (&lt;code>dropdown__toggle-text&lt;/code>):&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">cy&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="kr">get&lt;/span>&lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;div.pf-v5-c-masthead__content button span.pf-v5-c-dropdown__toggle-text&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">).&lt;/span>&lt;span class="nx">then&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="nx">$ele&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="p">...&lt;/span> &lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>E.g.: Cypress code using PF5 class names (&lt;code>menu-toggle__text&lt;/code>):&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">cy&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="kr">get&lt;/span>&lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;div.pf-v5-c-masthead__content button span.pf-v5-c-menu-toggle__text&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">).&lt;/span>&lt;span class="nx">then&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="nx">$ele&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="p">...&lt;/span> &lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h1 id="conclusions">Conclusions&lt;/h1>
+&lt;p>We have introduced the main PatternFly 5 key features and offered a comprehensive guide on migrating any React project to the latest version of the library. I think the PatternFly team did (and are already doing) a great job on this major release. Looking forward to see the next features.&lt;/p>
+&lt;p>As this guide is base on my personal experience, some gaps and corner cases might have been not covered enough, so any comments or extra tips are more than welcome. Thanks for reading!&lt;/p>
+&lt;blockquote>
+&lt;p>Photo by &lt;a href="https://unsplash.com/@aridley88?utm_content=creditCopyText&amp;utm_medium=referral&amp;utm_source=unsplash">Andrew Ridley&lt;/a> on &lt;a href="https://unsplash.com/photos/a-multicolored-tile-wall-with-a-pattern-of-small-squares-jR4Zf-riEjI?utm_content=creditCopyText&amp;utm_medium=referral&amp;utm_source=unsplash">Unsplash&lt;/a>&lt;/p>
+&lt;/blockquote></description></item></channel></rss>
