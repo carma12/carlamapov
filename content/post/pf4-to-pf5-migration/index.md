@@ -10,16 +10,16 @@ categories:
 
 # Introduction
 
-PatternFly 5 version was recently released in August 2023. This is a major upgrade of the previous version and has landed with some exciting new features. To mention some:
+[PatternFly 5](https://www.patternfly.org/) version was recently released in August 2023. This is a major upgrade of the previous version and has landed with some exciting new features. To mention some:
 
 - It supports React versions 17 and 18
 - They introduce new federated modules: a collection of independent remote software modules (associated with microfrontends)
 - Updated implementation of some popular components: Wizard, Select, Dropdown, and Table
 - Acessibility improvements
 
-The PatternFly team has also announce that they will adopt an annual major release cadence, so we can expect a PatternFly 6 library for mid-late 2024. This also means that the previous version of PatternFly 4 library will be only maintained for addressing high-priority issues until PF6 is available, because they will be commited to maintain two PatternFly versions at the same time.
+The PatternFly team has also announced that they will adopt an annual major release cadence, so we can expect a PatternFly 6 library for mid-late 2024. This also means that the previous version of PatternFly 4 library will be only maintained for addressing high-priority issues until PF6 is available, because they will be commited to maintain two PatternFly versions at the same time.
 
-As a consumer of the previous one (PF4), this sounds really exciting and I couldn't wait to check the newly released PatternFly 5 library. So I want to share my experience adapting this library to the modern [WebUI project](https://github.com/freeipa/freeipa-webui) and provide some hints that I learned during the process. I hope this will help you for a successful migration ;-)
+As a consumer of the previous one (PF4), this sounds really exciting and I couldn't wait to check the newly released PatternFly 5 library. So I would like to share my experience adapting this library to the modern [WebUI project](https://github.com/freeipa/freeipa-webui) and providing some hints that I learned during the process. I hope this will help you for a successful migration ;-)
 
 # Migration steps
 
@@ -55,7 +55,7 @@ In the [oficial guidelines](https://www.patternfly.org/get-started/upgrade), the
 - [pf-codemods](https://github.com/patternfly/pf-codemods/tree/main/packages/pf-codemods) is an eslint wrapper to update `@patternfly/react-core@4.x.x` code to `5.x.x`. It will also assign some deprecated components with the `@deprecated` library.
 - [class-name-updater](https://github.com/patternfly/pf-codemods/tree/main/packages/class-name-updater) automatically identifies Patternfly class names that need to be updated after the introduction of versioned class names in Patternfly v5. For example: the class `pf-u-mt-lg` will be transformed into `pf-v5-u-mt-lg`.
 
-Those can be run in several steps regardless of the order. And there is something else to take into account: those codemods are meant to use **before** making any manual changes to the code. That means that those errors and warnings can still be there even when you have resolved them, leading to the "what-did-just-happened??" loop. So just to take it into account :)
+Those can be run in several steps regardless of the order. And there is something else to take into account: those codemods are meant to be used **before** making any manual changes to the code. That means that those errors and warnings can still be there even when you have resolved them, leading to the "what-did-just-happened??" loop. So just to take it into account :-)
 
 ### pf-codemods
 
@@ -65,7 +65,7 @@ To use this codemod and check the errors and warnings, we just execute the follo
 npx @patternfly/pf-codemods@latest <path-to-source-code>
 ```
 
-To allow the autofix to apply changes into out code (I strongly recommend this approach), we add the `--fix` argument:
+To allow the autofix to apply changes into our code (I strongly recommend this approach), we add the `--fix` argument:
 
 ```console
 npx @patternfly/pf-codemods@latest <path-to-source-code> --fix
@@ -158,7 +158,7 @@ New component:
 </Select>
 ```
 
-Not only the **component parameters**, but also the expected **method parameters** can change. Following with the example as a reference, the `onToggle` parameter has been transform to `toggle` and it must be returned as a reference:
+Not only the **component parameters**, but also the expected **method parameters** can change. Following with the example as a reference, the `onToggle` parameter has been transformed into `toggle` and it must be returned as a reference:
 
 New component:
 
@@ -181,9 +181,9 @@ As the [WebUI](https://github.com/freeipa/freeipa-webui) is relying on Webpack, 
 
 Although this is not mentioned in the official guide, it is good to keep in mind when migrating in React projects.
 
-If your project is using Cypress to perform integration and/or e2e tests, you might also want to adapt the tests and replace old the class names to PatternFly 5 ones. As some of the components have changed their core structure, this will likely cause tests to fail if they are referencing deprecated structures. These only apply to the newly implemented components that we mentioned above.
+If your project is using [Cypress](https://www.cypress.io/) to perform integration and/or e2e tests, you might also want to adapt the tests and replace old the class names to PatternFly 5 ones. As some of the components have changed their core structure, this will likely cause tests to fail if they are referencing deprecated structures. This only applies to the newly implemented components that we mentioned above.
 
-Cypress code using deprecated class names (`dropdown__toggle-text`):
+E.g.: Cypress code using deprecated class names (`dropdown__toggle-text`):
 
 ```ts
  cy.get(
@@ -191,7 +191,7 @@ Cypress code using deprecated class names (`dropdown__toggle-text`):
 ).then(($ele) => { ... };
 ```
 
-Cypress code using PF5 class names (`menu-toggle__text`):
+E.g.: Cypress code using PF5 class names (`menu-toggle__text`):
 
 ```ts
 cy.get(
