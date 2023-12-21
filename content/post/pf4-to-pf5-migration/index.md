@@ -19,7 +19,7 @@ categories:
 
 The PatternFly team has also announced that they will adopt an annual major release cadence, so we can expect a PatternFly 6 library for mid-late 2024. This also means that the previous version of PatternFly 4 library will be only maintained for addressing high-priority issues until PF6 is available, because they will be commited to maintain two PatternFly versions at the same time.
 
-As a consumer of the previous one (PF4), this sounds really exciting and I couldn't wait to check the newly released PatternFly 5 library. So I would like to share my experience adapting this library to the modern [WebUI project](https://github.com/freeipa/freeipa-webui) and providing some hints that I learned during the process. I hope this will help you for a successful migration ;-)
+As a consumer of the previous one (PF4), this sounds really exciting and I couldn't wait to check the newly released PatternFly 5 library. So I would like to share my experience adapting this library to the [modern FreeIPA WebUI project](https://github.com/freeipa/freeipa-webui) and providing some hints that I learned during the process. I hope this will help you for a successful migration ;-)
 
 # Migration steps
 
@@ -94,7 +94,7 @@ PatternFly 5 deprecates old implementations of some components in favor of new o
 
 Those will remain in the code base until, at least, the next major release (PF6).
 
-So for those projects that started with the previous PF4 version (like the [WebUI](https://github.com/freeipa/freeipa-webui)), is important to adapt those components to use the new ones. In order to do so, we just need to search in your code any PatternFly library that has the `deprecated` suffix. E.g. using the `Select` components:
+So for those projects that started with the previous PF4 version (like the [new FreeIPA WebUI](https://github.com/freeipa/freeipa-webui)), is important to adapt those components to use the new ones. In order to do so, we just need to search in your code any PatternFly library that has the `deprecated` suffix. E.g. using the `Select` components:
 
 ```ts
 import {
@@ -175,7 +175,7 @@ const toggleCASelect = (toggleRef: React.Ref<MenuToggleElement>) => (
 
 At this point, most (if not all) problems should be fixed. However, I strongly recommend to build your project and address any possible errors and leftovers in the code.
 
-As the [WebUI](https://github.com/freeipa/freeipa-webui) is relying on Webpack, I just had to use the alias (`npm run start`). But if your React project uses another bundler such as [create-react-app](https://create-react-app.dev/), you can build it via `npm run build`. In any case, a double-check on the project to detect any unexpected errors won't hurt.
+As the [new FreeIPA WebUI](https://github.com/freeipa/freeipa-webui) is relying on Webpack, I just had to use the alias (`npm run start`). But if your React project uses another bundler such as [create-react-app](https://create-react-app.dev/), you can build it via `npm run build`. In any case, a double-check on the project to detect any unexpected errors won't hurt.
 
 ## Bonus: Cypress
 
